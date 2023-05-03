@@ -1,0 +1,3 @@
+- CloudFront endpoint: https://d3et1cpiobu9jj.cloudfront.net
+- Website endpoint: http://my-088450696203-bucket.s3-website-us-east-1.amazonaws.com
+- S3 Object URL: https://my-088450696203-bucket.s3.amazonaws.com/index.html
