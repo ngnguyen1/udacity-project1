@@ -13,19 +13,26 @@ provider "aws" {
   region = "us-east-1"
 }
 
+locals {
+  mime_types = {
+    "css"  = "text/css"
+    "html" = "text/html"
+    "ico"  = "image/vnd.microsoft.icon"
+    "js"   = "application/javascript"
+    "json" = "application/json"
+    "map"  = "application/json"
+    "png"  = "image/png"
+    "svg"  = "image/svg+xml"
+    "txt"  = "text/plain"
+  }
+}
+
 resource "aws_s3_bucket" "example" {
   bucket = "ngnguyen-website-11235813"
 }
 
 resource "aws_s3_bucket_public_access_block" "example" {
   bucket = aws_s3_bucket.example.id
-}
-
-resource "aws_s3_object" "example" {
-  for_each = fileset("../dist/", "**")
-  bucket   = aws_s3_bucket.example.id
-  key      = each.value
-  source   = "../dist/${each.value}"
 }
 
 resource "aws_s3_bucket_website_configuration" "example" {
@@ -53,4 +60,13 @@ resource "aws_s3_bucket_policy" "public_read_access" {
   ]
 }
 EOF
+}
+
+resource "aws_s3_object" "example" {
+  for_each     = fileset("../dist/", "**")
+  bucket       = aws_s3_bucket.example.id
+  key          = each.value
+  source       = "../dist/${each.value}"
+  content_type = lookup(tomap(local.mime_types), element(split(".", each.key), length(split(".", each.key)) - 1))
+  etag         = md5("${path.module}/content/${each.key}")
 }
